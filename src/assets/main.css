@@ -1,0 +1,38 @@
+#app{
+  height: 100%;
+}
+
+.layout-main{
+  height: 100%;
+}
+
+.ant-layout-header .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.ant-layout-header .trigger:hover {
+  color: #1890ff;
+}
+
+.ant-layout-sider .logo {
+  font-size: 18px;
+  color:#fff;
+  height: 32px;
+  margin: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+.header-right{
+  text-align: right;
+  padding-right: 12px;
+}
