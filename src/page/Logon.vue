@@ -31,7 +31,7 @@
             console.log(resdata)
             storage.set('token',resdata.result.token)
             storage.set('user_name',resdata.result.user_name)
-            message.success('登录成功',1.5,()=>{ window.location.href = '/' });
+            message.success('登录成功',1,()=>{ window.location.href = '/' });
           }
           else{
             message.warning(resdata.msg);
