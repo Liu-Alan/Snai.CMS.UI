@@ -1,5 +1,6 @@
 <script lang="ts" setup>
   import { ref, onMounted, onBeforeMount } from 'vue';
+  import { useRouter } from 'vue-router'
 
   import { message } from 'ant-design-vue';
   import {
@@ -12,6 +13,8 @@
 
   import { storage } from '@/utils/storage';
   import { apiurl,rescode } from '@/utils/globalconst';
+
+  const router = useRouter()
 
   const openKeys = ref<string[]>(['sub0']);
   const collapsed = ref<boolean>(false);
@@ -81,6 +84,10 @@
       }
   })
 
+  const changeMenu = (route) =>{
+    router.push(route)
+  }
+
 </script>
 
 <template>
@@ -96,7 +103,7 @@
             </span>
           </template>
           <template v-for="(menuS,indexS) in menuSubs">
-            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="indexP+'-'+indexS">{{ menuS.title }}</a-menu-item>
+            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="indexP+'-'+indexS" @click="changeMenu('/admin')">{{ menuS.title }}</a-menu-item>
           </template>
         </a-sub-menu>
       </a-menu>
