@@ -103,7 +103,7 @@
             </span>
           </template>
           <template v-for="(menuS,indexS) in menuSubs">
-            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="indexP+'-'+indexS" @click="changeMenu('/admin')">{{ menuS.title }}</a-menu-item>
+            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="indexP+'-'+indexS" @click="changeMenu(menuS.ui_router)">{{ menuS.title }}</a-menu-item>
           </template>
         </a-sub-menu>
       </a-menu>
