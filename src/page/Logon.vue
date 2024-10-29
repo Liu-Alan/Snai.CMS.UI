@@ -1,7 +1,7 @@
 <script lang="ts" setup>
     import { reactive  } from 'vue';
-    import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
     import { message } from 'ant-design-vue';
+    import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
     import axios from 'axios';
 
     import { storage } from '@/utils/storage';
@@ -28,10 +28,9 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            console.log(resdata)
             storage.set('token',resdata.result.token)
             storage.set('user_name',resdata.result.user_name)
-            message.success('登录成功',1,()=>{ window.location.href = '/' });
+            message.success('登录成功', 1, ()=>{ window.location.href = '/' });
           }
           else{
             message.warning(resdata.msg);

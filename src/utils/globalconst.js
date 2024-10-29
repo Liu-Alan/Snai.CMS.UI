@@ -4,16 +4,18 @@ export const rescode = {
     success          : 200,
     fail             : 100,
     error            : 500,
-	invalidparams    : 400,
-	bindparamserror  : 401,
-	validparamserror : 402,
+
+	invalidparams    : 501,
+	bindparamserror  : 502,
+	validparamserror : 503,
+
 	permissionfailed : 403,
 
-	requesterror     : 10000,
-	authnotexist     : 10001,
-	authchecktimeout : 10002,
-	authcheckfail    : 10003,
-	authformatfail   : 10004,
+	requesterror     : 400,
+    authcheckfail    : 401,
+	authnotexist     : 402,
+	authchecktimeout : 404,
+	authformatfail   : 405,
 
-	recordnotfound : 20000
+	recordnotfound : 600
 }

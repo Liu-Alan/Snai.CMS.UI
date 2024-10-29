@@ -19,7 +19,7 @@
 }
 
 .ant-layout-sider .logo {
-  font-size: 18px;
+  font-size: 16px;
   color:#fff;
   height: 32px;
   margin: 16px;
@@ -30,6 +30,10 @@
 
 .site-layout .site-layout-background {
   background: #fff;
+}
+
+.ant-dropdown-link{
+  color: #333;
 }
 
 .header-right{
