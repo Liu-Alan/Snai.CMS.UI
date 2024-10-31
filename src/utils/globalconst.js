@@ -19,3 +19,7 @@ export const rescode = {
 
 	recordnotfound : 600
 }
+
+export const routerPath = new Map([
+	['/admins', {name:"admins", parent:"manage", router:"/api/admin/list"}]
+])	

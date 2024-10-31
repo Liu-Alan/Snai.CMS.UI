@@ -1,5 +1,5 @@
-<script lang="ts" setup>
-  import { ref, onMounted, onBeforeMount } from 'vue';
+<script setup>
+  import { ref, onMounted, onBeforeMount, watch } from 'vue';
   import { useRouter } from 'vue-router'
 
   import { message } from 'ant-design-vue';
@@ -12,16 +12,27 @@
   import axios from 'axios';
 
   import { storage } from '@/utils/storage';
-  import { apiurl,rescode } from '@/utils/globalconst';
+  import { apiurl,rescode,routerPath } from '@/utils/globalconst';
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const openKeys = ref<string[]>(['sub0']);
-  const collapsed = ref<boolean>(false);
+  const selectedKeys = ref([]);
+  const openKeys = ref([]);
+  const collapsed = ref(false);
   const user_name = ref(storage.get('user_name'));
   var menuPas = ref([]);
   var menuSubs = ref([]);
   var menuActs = ref([]);
+  const routerUrl = ref('');
+
+  watch(() => router.currentRoute.value.path, (path, oldPath) => {
+    var menuRouter = routerPath.get(path)
+    if (typeof menuRouter != "undefined" && menuRouter != null){
+      routerUrl.value = menuRouter.router;
+      selectedKeys.value.push(menuRouter.name);
+      openKeys.value.push(menuRouter.parent);
+    }
+  })
 
   const isMobile = () => {
     let flag = navigator.userAgent.match(/(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i)
@@ -78,14 +89,15 @@
 
   onMounted(() => {
     if (isMobile()) {
-      collapsed.value = true
+      collapsed.value = true;
       } else {
-        collapsed.value = false
+        collapsed.value = false;
       }
   })
 
-  const changeMenu = (route) =>{
-    router.push(route)
+  const changeMenu = (route, url) =>{
+    routerUrl.value = url;
+    router.push(route);
   }
 
 </script>
@@ -94,16 +106,16 @@
   <a-layout class="layout-main">
     <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
       <div class="logo">管 理 后 台</div>
-      <a-menu v-model:openKeys="openKeys" theme="dark" mode="inline">
-        <a-sub-menu v-for="(menuP,indexP) in menuPas" :key="'sub'+indexP">
+      <a-menu v-model:openKeys="openKeys" v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
+        <a-sub-menu v-for="menuP in menuPas" :key="menuP.name">
           <template #title>
             <span>
               <user-outlined v-show="menuP.name=='manage'" />
               <span>{{ menuP.title }}</span>
             </span>
           </template>
-          <template v-for="(menuS,indexS) in menuSubs">
-            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="indexP+'-'+indexS" @click="changeMenu(menuS.ui_router)">{{ menuS.title }}</a-menu-item>
+          <template v-for="menuS in menuSubs">
+            <a-menu-item v-if="menuS.parent_id==menuP.id" :key="menuS.name" @click="changeMenu(menuS.ui_router, menuS.router)">{{ menuS.title }}</a-menu-item>
           </template>
         </a-sub-menu>
       </a-menu>
@@ -142,7 +154,7 @@
       <a-layout-content
         :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
       >
-        <RouterView />
+        <RouterView :routerUrl="routerUrl"/>
       </a-layout-content>
     </a-layout>
   </a-layout>

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<script setup>
     import { reactive  } from 'vue';
     import { message } from 'ant-design-vue';
     import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
@@ -7,17 +7,11 @@
     import { storage } from '@/utils/storage';
     import { apiurl,rescode } from '@/utils/globalconst';
 
-
-    interface FormState {
-      user_name: string;
-      password: string;
-    }
-
-    const formState = reactive<FormState>({
+    const formState = reactive({
       user_name: '',
       password: '',
     });
-    const onFinish = (values: any) => {
+    const onFinish = values => {
       let resdata;
       axios({
           method: 'post',
@@ -41,7 +35,7 @@
         });
     };
 
-    const onFinishFailed = (errorInfo: any) => {
+    const onFinishFailed = errorInfo => {
         
     };
 </script>

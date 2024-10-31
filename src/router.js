@@ -1,4 +1,4 @@
-import { createMemoryHistory, createRouter } from 'vue-router'
+import { createWebHistory, createRouter } from 'vue-router'
 
 import Home from './components/Home.vue'
 import Admins from './components/Admins.vue'
@@ -9,8 +9,8 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createMemoryHistory(),
-  routes,
+  history: createWebHistory(),
+  routes
 })
 
 export default router
