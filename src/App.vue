@@ -1,6 +1,7 @@
 <script setup>
   import { ref, onMounted, onBeforeMount, watch } from 'vue';
   import { useRouter } from 'vue-router'
+  import axios from 'axios';
 
   import { message } from 'ant-design-vue';
   import {
@@ -9,7 +10,7 @@
     MenuFoldOutlined,
     DownOutlined,
   } from '@ant-design/icons-vue';
-  import axios from 'axios';
+  
 
   import { storage } from '@/utils/storage';
   import { apiurl,rescode,routerPath } from '@/utils/globalconst';
@@ -24,6 +25,7 @@
   var menuSubs = ref([]);
   var menuActs = ref([]);
   const routerUrl = ref('');
+  const openPwdModal = ref(false);
 
   watch(() => router.currentRoute.value.path, (path, oldPath) => {
     var menuRouter = routerPath.get(path)
@@ -100,6 +102,51 @@
     router.push(route);
   }
 
+  const showPwdModal = () => {
+    openPwdModal.value = true;
+  };
+
+
+  const onExitClick =() =>{
+    let token=String(storage.get('token'))
+    if (typeof token == "undefined" || token == null || token == ""){
+        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/' });
+    }else{
+        let resdata;
+        axios({
+            method: 'post',
+            url: apiurl+'/api/home/logout',
+            headers: {'Authorization': 'Bearer ' + token }
+          })
+          .then(response =>{
+            resdata = response.data;
+            if(resdata.code == rescode.success){
+              storage.remove('token');
+              storage.remove('user_name');
+              message.success(resdata.msg, 1, ()=>{ window.location.href = '/logon/' });
+            }
+            else{
+                message.warning(resdata.msg);
+            }
+          })
+          .catch(error=>{
+            if(error.response){
+                resdata = error.response.data;
+                if(resdata.code >= rescode.authcheckfail && resdata.code <= rescode.authformatfail){
+                    message.warning(resdata.msg, 1, ()=>{ window.location.href = '/logon/' });
+                }
+                else{
+                    message.warning(resdata.msg);
+                }
+            }else if (error.request) {
+                message.warning("网络有问题，请稍后重试");
+            } else {
+                message.warning("网络有问题，请稍后重试");
+            }
+          });
+    }
+  }
+
 </script>
 
 <template>
@@ -140,10 +187,10 @@
               <template #overlay>
                 <a-menu>
                   <a-menu-item>
-                    <a href="javascript:;">修改密码</a>
+                    <a @click="showPwdModal" href="javascript:;">修改密码</a>
                   </a-menu-item>
                   <a-menu-item>
-                    <a href="javascript:;">退出</a>
+                    <a @click="onExitClick" href="javascript:;">退出</a>
                   </a-menu-item>
                 </a-menu>
               </template>
@@ -155,6 +202,11 @@
         :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
       >
         <RouterView :routerUrl="routerUrl"/>
+        <template>
+            <a-modal v-model:open="openPwdModal" width="400px" title="修改密码" :footer="null" :maskClosable="false">
+              <change-password></change-password>
+            </a-modal>
+        </template>
       </a-layout-content>
     </a-layout>
   </a-layout>

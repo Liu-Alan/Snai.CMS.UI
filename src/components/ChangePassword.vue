@@ -3,8 +3,6 @@
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
-    import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
-
     import { storage } from '@/utils/storage';
     import { apiurl,rescode } from '@/utils/globalconst';
 
@@ -41,40 +39,37 @@
 </script>
 
 <template>
-    <div class="title-logon">管 理 后 台</div>
+  <div>
     <a-form
       :model="formState"
       name="basic"
       autocomplete="off"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
-      style="min-width: 320px; max-width: 450px;"
+      style="min-width: 290px; max-width: 350px;"
     >
       <a-form-item
+        label="原密码"
         name="user_name"
-        :rules="[{ required: true, message: '请输入用户名!' }]"
+        :rules="[{ required: true, message: '请输入原密码!' }]"
+        style="margin-top: 20px;"
       >
-        <a-input v-model:value="formState.user_name" placeholder="用户名" size="large">
-          <template #prefix>
-            <UserOutlined class="site-form-item-icon" />
-          </template>
-        </a-input>
+        <a-input-password v-model:value="formState.user_name" placeholder="原密码" />
       </a-form-item>
   
       <a-form-item
+        label="新密码"
         name="password"
-        :rules="[{ required: true, message: '请输入密码!' }]"
+        :rules="[{ required: true, message: '请输入新密码!' }]"
+        style="margin-top: 5px;"
       >
-        <a-input-password v-model:value="formState.password" placeholder="密码" size="large" style="margin-top: 5px;">
-          <template #prefix>
-            <LockOutlined class="site-form-item-icon" />
-          </template>
-        </a-input-password>
+        <a-input-password v-model:value="formState.password" placeholder="新密码" />
       </a-form-item>
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
-            <a-button type="primary" html-type="submit" size="large">登 录</a-button>
+            <a-button type="primary" html-type="submit">登 录</a-button>
         </a-form-item>
       </a-row>
     </a-form>
+  </div>
 </template>
