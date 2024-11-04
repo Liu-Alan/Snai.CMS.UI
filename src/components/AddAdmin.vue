@@ -1,5 +1,5 @@
 <script setup>
-    import { reactive  } from 'vue';
+    import { reactive,ref } from 'vue';
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
@@ -7,28 +7,86 @@
     import { apiurl,rescode } from '@/utils/globalconst';
 
     const formState = reactive({
-      old_password: '',
+      user_name: '',
       password: '',
       password2: '',
+      role_id: undefined,
+      state: 1,
     });
 
-    const emits = defineEmits(['closePwdModal']);
+    const emits = defineEmits(['closeAddAdminModal']);
 
     const initFormData = () =>{
-      formState.old_password = '';
+      formState.user_name = '';
       formState.password = '';
       formState.password2 = '';
+      formState.role_id = undefined;
+      formState.state = 1;
     }
 
     const checkRePassword = (_, value) => {
       if (value == '') {
         return Promise.reject(new Error('请输入确认密码'));
       }else if(value !== formState.password){
-        return Promise.reject(new Error('确认密码与新密码不一致'));
+        return Promise.reject(new Error('确认密码与密码不一致'));
       }else{
         return Promise.resolve();
       }
     };
+
+    const rules = {
+        user_name: [
+            {
+              required: true,
+              message: '请输入用户名',
+              trigger: 'change',
+            },
+            {
+              min: 4,
+              max: 32,
+              message: '用户名长度为4到32位',
+              trigger: 'blur',
+            },
+        ],
+        password: [
+            {
+              required: true,
+              message: '请输入密码',
+              trigger: 'change',
+            },
+            {
+              min: 6,
+              max: 20,
+              message: '密码长度为6到20位',
+              trigger: 'blur',
+            },
+        ],
+        password2: [
+            {
+              required: true,
+              message: '请输入确认密码',
+              trigger: 'change',
+            },
+            {
+              validator: checkRePassword,
+              trigger: 'blur',
+            },
+        ],
+        role_id: [
+            {
+              required: true,
+              message: '请选择角色',
+              trigger: 'change',
+            },
+        ],
+        state: [
+            {
+              required: true,
+              message: '请选择状态',
+              trigger: 'change',
+            },
+        ]
+    }
 
     const onFinish = values => {
       let token=String(storage.get('token'));
@@ -48,9 +106,9 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            message.success('修改成功', 1, ()=>{ 
+            message.success('添加成功', 1, ()=>{ 
               initFormData();
-              emits("closePwdModal"); 
+              emits("closeAddAdminModal"); 
             });
           }
           else{
@@ -83,39 +141,48 @@
     <a-form
       :model="formState"
       name="basic"
+      :rules="rules"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
       :label-col="{ span: 5 }"
       :wrapper-col="{ span: 19 }"
     >
       <a-form-item
-        label="原密码"
-        name="old_password"
-        :rules="[{ required: true, message: '请输入原密码' }]"
+        label="用户名"
+        name="user_name"
         style="margin-top: 20px;"
       >
-        <a-input-password v-model:value="formState.old_password" placeholder="原密码" />
+        <a-input v-model:value="formState.user_name" placeholder="用户名" />
       </a-form-item>
   
       <a-form-item
-        label="新密码"
+        label="密码"
         name="password"
-        :rules="[{ required: true, message: '请输入新密码' }]"
         style="margin-top: 5px;"
       >
-        <a-input-password v-model:value="formState.password" placeholder="新密码" />
+        <a-input-password v-model:value="formState.password" placeholder="密码" />
       </a-form-item>
       <a-form-item
         label="确认密码"
         name="password2"
-        :rules="[{ required: true, validator: checkRePassword }]"
         style="margin-top: 5px;"
       >
         <a-input-password v-model:value="formState.password2" placeholder="确认密码" />
       </a-form-item>
+      <a-form-item label="角色" name="role_id">
+        <a-select v-model:value="formState.role_id" placeholder="请选择角色">
+            <a-select-option value="1">超级管理员</a-select-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item label="状态" name="state">
+        <a-radio-group v-model:value="formState.state">
+            <a-radio :value="1">启用</a-radio>
+            <a-radio :value="2">禁用</a-radio>
+        </a-radio-group>
+      </a-form-item>
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
-            <a-button type="primary" html-type="submit">修 改</a-button>
+            <a-button type="primary" html-type="submit">添 加</a-button>
         </a-form-item>
       </a-row>
     </a-form>

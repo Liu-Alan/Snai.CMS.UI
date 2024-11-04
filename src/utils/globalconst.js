@@ -5,9 +5,9 @@ export const rescode = {
     fail             : 100,
     error            : 500,
 
-	invalidparams    : 501,
-	bindparamserror  : 502,
-	validparamserror : 503,
+	invalidparams    : 406,
+	bindparamserror  : 407,
+	validparamserror : 408,
 
 	permissionfailed : 403,
 

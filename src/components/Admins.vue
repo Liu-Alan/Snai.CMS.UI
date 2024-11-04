@@ -8,6 +8,8 @@ import { message, Modal } from 'ant-design-vue';
 import { storage } from '@/utils/storage';
 import { apiurl,rescode } from '@/utils/globalconst';
 
+import AddAdmin from './AddAdmin.vue'
+
 const props = defineProps({
   routerUrl: String
 })
@@ -45,6 +47,7 @@ const currentRef = ref(1);
 const pageSizeRef = ref(10);
 const pageSizeOptions = ref(['10', '20', '50']);
 const total = ref(0);
+const openAddAdminModal = ref(false);
 
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
@@ -109,9 +112,6 @@ const onDisable = id => {
 
 const onUnlock = id => {
   console.log(id);
-};
-
-const onBottomAdd = () => {
 };
 
 const onBottomDelete = () => {
@@ -187,6 +187,15 @@ const onPageChange = (page, pageSize) => {
 const onShowSizeChange = (current, pageSize) => {
   currentRef.value = 1;
 };
+
+const showAddAdminModal = () => {
+  openAddAdminModal.value = true;
+};
+  
+const closeAddAdminModal = () => {
+  openAddAdminModal.value = false;
+  onPageChange(currentRef.value,pageSizeRef.value);
+};
 </script>
 
 <template>
@@ -233,7 +242,7 @@ const onShowSizeChange = (current, pageSize) => {
   </a-table>
   <a-row>
     <a-col :span="9" style="margin-top: 8px;">
-      <a-button type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="onBottomAdd">添加</a-button>
+      <a-button type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddAdminModal">添加</a-button>
       <a-button type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBottomDelete">删除</a-button>
       <a-button type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBottomeEnable">启用</a-button>
       <a-button type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBottomDisable">禁用</a-button>
@@ -254,5 +263,10 @@ const onShowSizeChange = (current, pageSize) => {
       </div>
     </a-col>
   </a-row>
+  <template>
+    <a-modal v-model:open="openAddAdminModal" width="400px" title="添加用户" :footer="null" :maskClosable="false">
+      <add-admin @closeAddAdminModal="closeAddAdminModal"></add-admin>
+    </a-modal>
+  </template>
 </template>
 <style scoped src="../assets/admins.css"></style>
