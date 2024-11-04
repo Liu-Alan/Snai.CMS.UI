@@ -14,6 +14,22 @@
 
     const emits = defineEmits(['closePwdModal']);
 
+    const initFormData = () =>{
+      formState.old_password = '';
+      formState.password = '';
+      formState.password2 = '';
+    }
+
+    const checkRePassword = (_, value) => {
+      if (value == '') {
+        return Promise.reject(new Error('请输入确认密码'));
+      }else if(value !== formState.password){
+        return Promise.reject(new Error('确认密码与新密码不一致'));
+      }else{
+        return Promise.resolve();
+      }
+    };
+
     const onFinish = values => {
       let token=String(storage.get('token'));
       if (typeof token == "undefined" || token == null || token == ""){
@@ -32,7 +48,10 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            message.success('修改成功', 1, ()=>{ emits("closePwdModal") });
+            message.success('修改成功', 1, ()=>{ 
+              initFormData();
+              emits("closePwdModal"); 
+            });
           }
           else{
             message.warning(resdata.msg);
@@ -52,16 +71,6 @@
     };
 
     const onFinishFailed = errorInfo => {
-    };
-
-    const checkRePassword = (_, value) => {
-      if (value == '') {
-        return Promise.reject(new Error('请输入确认密码'));
-      }else if(value !== formState.password){
-        return Promise.reject(new Error('确认密码与新密码不一致'));
-      }else{
-        return Promise.resolve();
-      }
     };
 </script>
 
