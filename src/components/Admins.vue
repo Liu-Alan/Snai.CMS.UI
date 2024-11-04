@@ -49,7 +49,7 @@ const total = ref(0);
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
     if (typeof token == "undefined" || token == null || token == ""){
-        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/' });
+        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
     }else{
         let resdata;
         axios({

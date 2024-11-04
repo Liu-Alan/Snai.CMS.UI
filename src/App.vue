@@ -105,12 +105,15 @@
   const showPwdModal = () => {
     openPwdModal.value = true;
   };
-
+  
+  const closePwdModal = () => {
+    openPwdModal.value = false;
+  };
 
   const onExitClick =() =>{
     let token=String(storage.get('token'))
     if (typeof token == "undefined" || token == null || token == ""){
-        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/' });
+        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
     }else{
         let resdata;
         axios({
@@ -204,7 +207,7 @@
         <RouterView :routerUrl="routerUrl"/>
         <template>
             <a-modal v-model:open="openPwdModal" width="400px" title="修改密码" :footer="null" :maskClosable="false">
-              <change-password></change-password>
+              <change-password @closePwdModal="closePwdModal"></change-password>
             </a-modal>
         </template>
       </a-layout-content>
