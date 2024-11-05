@@ -22,15 +22,6 @@
     const emits = defineEmits(['closeAddAdminModal']);
     const roles = ref([]);
 
-    const initFormData = () =>{
-      formState.id = 0;
-      formState.user_name = '';
-      formState.password = '******';
-      formState.password2 = '******';
-      formState.role_id = undefined;
-      formState.state = 1;
-    }
-
     const checkRePassword = (_, value) => {
       if (value == '') {
         return Promise.reject(new Error('请输入确认密码'));
@@ -191,7 +182,6 @@
           resdata = response.data;
           if(resdata.code == rescode.success){
             message.success('修改成功', 1, ()=>{ 
-              initFormData();
               emits("closeUpdateAdminModal"); 
             });
           }
@@ -236,7 +226,7 @@
       >
         <a-input v-model:value="formState.id" :disabled="true" />
       </a-form-item>
-      
+
       <a-form-item
         label="用户名"
         name="user_name"
