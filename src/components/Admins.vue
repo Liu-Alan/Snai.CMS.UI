@@ -9,11 +9,14 @@ import { storage } from '@/utils/storage';
 import { apiurl,rescode } from '@/utils/globalconst';
 
 import AddAdmin from './AddAdmin.vue'
+import UpdateAdmin from './UpdateAdmin.vue'
 
 const props = defineProps({
   routerUrl: String,
   menuActs: Map
 })
+
+const adminID = ref(0);
 
 const columns = [
   {
@@ -49,6 +52,7 @@ const pageSizeRef = ref(10);
 const pageSizeOptions = ref(['10', '20', '50']);
 const total = ref(0);
 const openAddAdminModal = ref(false);
+const openUpdateAdminModal = ref(false);
 
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
@@ -90,55 +94,6 @@ onBeforeMount(()=>{
           });
     }
 })
-
-const onSelectChange = selectedRowKeys => {
-  selectedStatKeys.value = selectedRowKeys;
-};
-
-const onAlter = id => {
-  console.log(id);
-};
-
-const onDelete = id => {
-  console.log(id);
-};
-
-const onEnable = id => {
-  console.log(id);
-};
-
-const onDisable = id => {
-  console.log(id);
-};
-
-const onUnlock = id => {
-  console.log(id);
-};
-
-const onBottomDelete = () => {
-  if(selectedStatKeys.value.length<=0){
-    message.warning('您没有选择任何列');
-  }else{
-    Modal.confirm({
-      icon: createVNode(ExclamationCircleOutlined),
-      content: '您确定要删除选择的列吗',
-      okText: '确认',
-      cancelText: '取消',
-      onOk() {
-        console.log(selectedStatKeys.value);
-      },
-      onCancel() {},
-    });
-  }
-};
-
-const onBottomeEnable = () => {
-  console.log(selectedStatKeys.value);
-};
-
-const onBottomDisable = () => {
-  console.log(selectedStatKeys.value);
-};
 
 const onPageChange = (page, pageSize) => {
   let token=String(storage.get('token'));
@@ -189,6 +144,61 @@ const onShowSizeChange = (current, pageSize) => {
   currentRef.value = 1;
 };
 
+const onSelectChange = selectedRowKeys => {
+  selectedStatKeys.value = selectedRowKeys;
+};
+
+const showUpdateAdminModal = id => {
+  adminID.value = id;
+  openUpdateAdminModal.value = true;
+};
+
+const closeUpdateAdminModal = () => {
+  openUpdateAdminModal.value = false;
+  onPageChange(currentRef.value,pageSizeRef.value);
+};
+
+const onDelete = id => {
+  console.log(id);
+};
+
+const onEnable = id => {
+  console.log(id);
+};
+
+const onDisable = id => {
+  console.log(id);
+};
+
+const onUnlock = id => {
+  console.log(id);
+};
+
+const onBottomDelete = () => {
+  if(selectedStatKeys.value.length<=0){
+    message.warning('您没有选择任何列');
+  }else{
+    Modal.confirm({
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '您确定要删除选择的列吗',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        console.log(selectedStatKeys.value);
+      },
+      onCancel() {},
+    });
+  }
+};
+
+const onBottomeEnable = () => {
+  console.log(selectedStatKeys.value);
+};
+
+const onBottomDisable = () => {
+  console.log(selectedStatKeys.value);
+};
+
 const showAddAdminModal = () => {
   openAddAdminModal.value = true;
 };
@@ -211,26 +221,31 @@ const closeAddAdminModal = () => {
         <a-tag v-show="record.lock_state==1" color="green">未锁定</a-tag>
         <a-tag v-show="record.lock_state==2" color="orange">锁定</a-tag>
       </template>
+
       <template v-else-if="column.dataIndex === 'operation'">
-        <a v-if="props.menuActs.has('updateadmin')"><a-tag color="blue"  @click="onAlter(record.id)" style="cursor: pointer;">修改</a-tag></a>
+        <a v-if="props.menuActs.has('updateadmin')"><a-tag color="blue"  @click="showUpdateAdminModal(record.id)" style="cursor: pointer;">修改</a-tag></a>
+
         <a-popconfirm v-if="props.menuActs.has('deleteadmin')"
           title="确定删除吗?" ok-text="确定" cancel-text="取消"
           @confirm="onDelete(record.id)"
         >
           <a><a-tag color="red" style="cursor: pointer;">删除</a-tag></a>
         </a-popconfirm>
+
         <a-popconfirm v-if="record.state==2 && props.menuActs.has('endisableadmin')"
           title="确定启用吗?" ok-text="确定" cancel-text="取消"
           @confirm="onEnable(record.id)"
         >
           <a><a-tag color="green" style="cursor: pointer;">启用</a-tag></a>
         </a-popconfirm>
+
         <a-popconfirm v-else-if="record.state==1 && props.menuActs.has('endisableadmin')"
           title="确定禁用吗?" ok-text="确定" cancel-text="取消"
           @confirm="onDisable(record.id)"
         >
           <a><a-tag color="orange" style="cursor: pointer;">禁用</a-tag></a>
         </a-popconfirm>
+
         <a-popconfirm v-if="record.lock_state==2 && props.menuActs.has('unlockadmin')"
           title="确定解锁吗?" ok-text="确定" cancel-text="取消"
           @confirm="onUnlock(record.id)"
@@ -267,6 +282,11 @@ const closeAddAdminModal = () => {
   <template>
     <a-modal v-model:open="openAddAdminModal" width="400px" title="添加用户" :footer="null" :maskClosable="false">
       <add-admin @closeAddAdminModal="closeAddAdminModal"></add-admin>
+    </a-modal>
+  </template>
+  <template>
+    <a-modal v-model:open="openUpdateAdminModal" width="400px" title="修改用户" :footer="null" :maskClosable="false">
+      <update-admin :adminID="adminID" @closeUpdateAdminModal="closeUpdateAdminModal"></update-admin>
     </a-modal>
   </template>
 </template>

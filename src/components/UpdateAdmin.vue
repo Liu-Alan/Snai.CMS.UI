@@ -1,15 +1,20 @@
 <script setup>
-    import { reactive,ref,onBeforeMount } from 'vue';
+    import { reactive,ref,onBeforeMount,onMounted,onUpdated } from 'vue';
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
     import { storage } from '@/utils/storage';
     import { apiurl,rescode } from '@/utils/globalconst';
 
+    const props = defineProps({
+      adminID: Number
+    })
+
     const formState = reactive({
+      id: 0,
       user_name: '',
-      password: '',
-      password2: '',
+      password: '******',
+      password2: '******',
       role_id: undefined,
       state: 1,
     });
@@ -18,9 +23,10 @@
     const roles = ref([]);
 
     const initFormData = () =>{
+      formState.id = 0;
       formState.user_name = '';
-      formState.password = '';
-      formState.password2 = '';
+      formState.password = '******';
+      formState.password2 = '******';
       formState.role_id = undefined;
       formState.state = 1;
     }
@@ -51,11 +57,6 @@
         ],
         password: [
             {
-              required: true,
-              message: '请输入密码',
-              trigger: 'change',
-            },
-            {
               min: 6,
               max: 20,
               message: '密码长度为6到20位',
@@ -64,7 +65,6 @@
         ],
         password2: [
             {
-              required: true,
               validator: checkRePassword,
               trigger: 'change',
             },
@@ -112,13 +112,64 @@
                     }else{
                         message.warning(resdata.msg);
                     }
-                }else if(error.request) {
+                }else if (error.request) {
                     message.warning("网络有问题，请稍后重试");
-                }else{
+                } else {
                     message.warning("网络有问题，请稍后重试");
                 }
             });
         }
+    })
+
+    const GetAdmin = (id) =>{
+        let token=String(storage.get('token'));
+        if (typeof token == "undefined" || token == null || token == ""){
+            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+        }else{
+            let resdata;
+            axios({
+                method: 'get',
+                url: apiurl+'/api/admin/get',
+                headers: {'Authorization': 'Bearer ' + token },
+                params: {
+                  id: id
+                },
+            })
+            .then(response =>{
+                resdata = response.data;
+                if(resdata.code == rescode.success){
+                    formState.user_name = resdata.result.user_name;
+                    formState.role_id = resdata.result.role_id;
+                    formState.state = resdata.result.state;
+                }else{
+                    message.warning(resdata.msg);
+                }
+            })
+            .catch(error=>{
+                if(error.response){
+                    resdata = error.response.data;
+                    if(resdata.code >= rescode.authcheckfail && resdata.code <= rescode.authformatfail){
+                        message.warning(resdata.msg, 2, ()=>{ window.location.href = '/logon/' });
+                    }else{
+                        message.warning(resdata.msg);
+                    }
+                }else if (error.request) {
+                    message.warning("网络有问题，请稍后重试");
+                } else {
+                    message.warning("网络有问题，请稍后重试");
+                }
+            });
+        }
+    }
+
+    onMounted(()=>{
+        formState.id=props.adminID;
+        GetAdmin(props.adminID);
+    })
+
+    onUpdated(()=>{
+        formState.id=props.adminID;
+        GetAdmin(props.adminID);
     })
 
     const onFinish = values => {
@@ -129,7 +180,7 @@
         let resdata;
         axios({
           method: 'post',
-          url: apiurl+'/api/admin/add',
+          url: apiurl+'/api/admin/update',
           data: values,
           headers: {
             'Content-Type': 'multipart/form-data;',
@@ -139,9 +190,9 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            message.success('添加成功', 1, ()=>{ 
+            message.success('修改成功', 1, ()=>{ 
               initFormData();
-              emits("closeAddAdminModal"); 
+              emits("closeUpdateAdminModal"); 
             });
           }
           else{
@@ -180,6 +231,12 @@
       :label-col="{ span: 5 }"
       :wrapper-col="{ span: 19 }"
     >
+      <a-form-item v-show="false"
+        name="id"
+      >
+        <a-input v-model:value="formState.id" :disabled="true" />
+      </a-form-item>
+      
       <a-form-item
         label="用户名"
         name="user_name"
@@ -215,7 +272,7 @@
       </a-form-item>
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
-            <a-button type="primary" html-type="submit">添 加</a-button>
+            <a-button type="primary" html-type="submit">修 改</a-button>
         </a-form-item>
       </a-row>
     </a-form>
