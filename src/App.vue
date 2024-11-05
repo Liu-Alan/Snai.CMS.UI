@@ -23,7 +23,7 @@
   const user_name = ref(storage.get('user_name'));
   var menuPas = ref([]);
   var menuSubs = ref([]);
-  var menuActs = ref([]);
+  var menuActs = ref(new Map());
   const routerUrl = ref('');
   const openPwdModal = ref(false);
 
@@ -62,8 +62,8 @@
                     if(menu.menu == 1 && menu.parent_id>0){
                         menuSubs.value.push(menu);
                     }
-                    if(menu.menu == 2){
-                        menuActs.value.push(menu);
+                    if(menu.menu == 2 && menu.name !==''){
+                        menuActs.value.set(menu.name,menu.router);
                     }
                 });;
             }
@@ -204,7 +204,7 @@
       <a-layout-content
         :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
       >
-        <RouterView :routerUrl="routerUrl"/>
+        <RouterView :routerUrl="routerUrl" :menuActs="menuActs"/>
         <template>
             <a-modal v-model:open="openPwdModal" width="400px" title="修改密码" :footer="null" :maskClosable="false">
               <change-password @closePwdModal="closePwdModal"></change-password>

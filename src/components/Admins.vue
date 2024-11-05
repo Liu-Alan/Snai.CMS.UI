@@ -11,7 +11,8 @@ import { apiurl,rescode } from '@/utils/globalconst';
 import AddAdmin from './AddAdmin.vue'
 
 const props = defineProps({
-  routerUrl: String
+  routerUrl: String,
+  menuActs: Map
 })
 
 const columns = [
@@ -88,7 +89,7 @@ onBeforeMount(()=>{
             }
           });
     }
-  })
+})
 
 const onSelectChange = selectedRowKeys => {
   selectedStatKeys.value = selectedRowKeys;
@@ -211,41 +212,41 @@ const closeAddAdminModal = () => {
         <a-tag v-show="record.lock_state==2" color="orange">锁定</a-tag>
       </template>
       <template v-else-if="column.dataIndex === 'operation'">
-        <a><a-tag color="blue"  @click="onAlter(record.id)" style="cursor: pointer;">修改</a-tag></a>
-        <a-popconfirm
+        <a v-if="props.menuActs.has('updateadmin')"><a-tag color="blue"  @click="onAlter(record.id)" style="cursor: pointer;">修改</a-tag></a>
+        <a-popconfirm v-if="props.menuActs.has('deleteadmin')"
           title="确定删除吗?" ok-text="确定" cancel-text="取消"
           @confirm="onDelete(record.id)"
         >
           <a><a-tag color="red" style="cursor: pointer;">删除</a-tag></a>
         </a-popconfirm>
-        <a-popconfirm v-if="record.state==2"
+        <a-popconfirm v-if="record.state==2 && props.menuActs.has('endisableadmin')"
           title="确定启用吗?" ok-text="确定" cancel-text="取消"
           @confirm="onEnable(record.id)"
         >
           <a><a-tag color="green" style="cursor: pointer;">启用</a-tag></a>
         </a-popconfirm>
-        <a-popconfirm v-else
+        <a-popconfirm v-else-if="record.state==1 && props.menuActs.has('endisableadmin')"
           title="确定禁用吗?" ok-text="确定" cancel-text="取消"
           @confirm="onDisable(record.id)"
         >
           <a><a-tag color="orange" style="cursor: pointer;">禁用</a-tag></a>
         </a-popconfirm>
-        <a-popconfirm v-if="record.lock_state==2"
+        <a-popconfirm v-if="record.lock_state==2 && props.menuActs.has('unlockadmin')"
           title="确定解锁吗?" ok-text="确定" cancel-text="取消"
           @confirm="onUnlock(record.id)"
         >
           <a><a-tag color="cyan" style="cursor: pointer;">解锁</a-tag></a>
         </a-popconfirm>
-        <a-tag v-else style="color: #999;">解锁</a-tag>
+        <a-tag v-else-if="record.lock_state==1 && props.menuActs.has('unlockadmin')" style="color: #999;">解锁</a-tag>
       </template>
     </template>
   </a-table>
   <a-row>
     <a-col :span="9" style="margin-top: 8px;">
-      <a-button type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddAdminModal">添加</a-button>
-      <a-button type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBottomDelete">删除</a-button>
-      <a-button type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBottomeEnable">启用</a-button>
-      <a-button type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBottomDisable">禁用</a-button>
+      <a-button v-if="props.menuActs.has('addadmin')" type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddAdminModal">添加</a-button>
+      <a-button v-if="props.menuActs.has('deleteadmin')" type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBottomDelete">删除</a-button>
+      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBottomeEnable">启用</a-button>
+      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBottomDisable">禁用</a-button>
     </a-col>
     <a-col :span="15" style="margin-top: 8px; text-align: right;">
       <div>

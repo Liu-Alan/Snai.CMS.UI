@@ -1,5 +1,5 @@
 <script setup>
-    import { reactive,ref } from 'vue';
+    import { reactive,ref,onBeforeMount } from 'vue';
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
@@ -15,6 +15,7 @@
     });
 
     const emits = defineEmits(['closeAddAdminModal']);
+    const roles = ref([]);
 
     const initFormData = () =>{
       formState.user_name = '';
@@ -64,12 +65,8 @@
         password2: [
             {
               required: true,
-              message: '请输入确认密码',
-              trigger: 'change',
-            },
-            {
               validator: checkRePassword,
-              trigger: 'blur',
+              trigger: 'change',
             },
         ],
         role_id: [
@@ -88,6 +85,44 @@
         ]
     }
 
+onBeforeMount(()=>{
+    let token=String(storage.get('token'));
+    if (typeof token == "undefined" || token == null || token == ""){
+        message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+    }else{
+        let resdata;
+        axios({
+            method: 'get',
+            url: apiurl+'/api/home/role',
+            headers: {'Authorization': 'Bearer ' + token }
+          })
+          .then(response =>{
+            resdata = response.data;
+            if(resdata.code == rescode.success){
+              roles.value = resdata.result;
+            }
+            else{
+              message.warning(resdata.msg);
+            }
+          })
+          .catch(error=>{
+            if(error.response){
+                resdata = error.response.data;
+                if(resdata.code >= rescode.authcheckfail && resdata.code <= rescode.authformatfail){
+                    message.warning(resdata.msg, 2, ()=>{ window.location.href = '/logon/' });
+                }
+                else{
+                    message.warning(resdata.msg);
+                }
+            }else if (error.request) {
+                message.warning("网络有问题，请稍后重试");
+            } else {
+                message.warning("网络有问题，请稍后重试");
+            }
+          });
+    }
+})
+
     const onFinish = values => {
       let token=String(storage.get('token'));
       if (typeof token == "undefined" || token == null || token == ""){
@@ -96,7 +131,7 @@
         let resdata;
         axios({
           method: 'post',
-          url: apiurl+'/api/home/changepassword',
+          url: apiurl+'/api/admin/add',
           data: values,
           headers: {
             'Content-Type': 'multipart/form-data;',
@@ -119,7 +154,7 @@
           if(error.response){
             resdata = error.response.data;
             if(resdata.code==rescode.validparamserror){
-              message.warning(resdata.result  );
+              message.warning(resdata.result);
             }else{
               message.warning(resdata.msg);
             }
@@ -171,7 +206,7 @@
       </a-form-item>
       <a-form-item label="角色" name="role_id">
         <a-select v-model:value="formState.role_id" placeholder="请选择角色">
-            <a-select-option value="1">超级管理员</a-select-option>
+            <a-select-option v-for="role in roles" :value="role.id">{{ role.title }}</a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="状态" name="state">
