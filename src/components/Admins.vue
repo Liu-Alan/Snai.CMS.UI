@@ -158,23 +158,165 @@ const closeUpdateAdminModal = () => {
   onPageChange(currentRef.value,pageSizeRef.value);
 };
 
-const onDelete = id => {
-  console.log(id);
+const onDeleteAdmin = id => {
+  let token=String(storage.get('token'))
+  if (typeof token == "undefined" || token == null || token == ""){
+      message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+  }else{
+      let resdata;
+      axios({
+          method: 'get',
+          url: apiurl+'/api/admin/delete',
+          headers: {'Authorization': 'Bearer ' + token },
+          params: {
+                id: id
+              },
+        })
+        .then(response =>{
+          resdata = response.data;
+          if(resdata.code == rescode.success){
+            message.success(resdata.msg);
+            onPageChange(currentRef.value,pageSizeRef.value);
+          }
+          else{
+              message.warning(resdata.msg);
+          }
+        })
+        .catch(error=>{
+          if(error.response){
+              resdata = error.response.data;
+              message.warning(resdata.msg);
+          }else if (error.request) {
+              message.warning("网络有问题，请稍后重试");
+          } else {
+              message.warning("网络有问题，请稍后重试");
+          }
+        });
+    }
 };
 
-const onEnable = id => {
-  console.log(id);
+const onEnableAdmin = id => {
+  let token=String(storage.get('token'))
+  if (typeof token == "undefined" || token == null || token == ""){
+      message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+  }else{
+      let resdata;
+      axios({
+          method: 'post',
+          url: apiurl+'/api/admin/endisable',
+          headers: {'Authorization': 'Bearer ' + token },
+          params: {
+                id: id,
+                state: 1
+              },
+        })
+        .then(response =>{
+          resdata = response.data;
+          if(resdata.code == rescode.success){
+            message.success(resdata.msg);
+            onPageChange(currentRef.value,pageSizeRef.value);
+          }
+          else{
+              message.warning(resdata.msg);
+          }
+        })
+        .catch(error=>{
+          if(error.response){
+            resdata = error.response.data;
+            if(resdata.code==rescode.validparamserror){
+              message.warning(resdata.result);
+            }else{
+              message.warning(resdata.msg);
+            }
+          }else if (error.request) {
+              message.warning("网络有问题，请稍后重试");
+          } else {
+              message.warning("网络有问题，请稍后重试");
+          }
+        });
+    }
 };
 
-const onDisable = id => {
-  console.log(id);
+const onDisableAdmin = id => {
+  let token=String(storage.get('token'))
+  if (typeof token == "undefined" || token == null || token == ""){
+      message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+  }else{
+      let resdata;
+      axios({
+          method: 'post',
+          url: apiurl+'/api/admin/endisable',
+          headers: {'Authorization': 'Bearer ' + token },
+          params: {
+                id: id,
+                state: 2
+              },
+        })
+        .then(response =>{
+          resdata = response.data;
+          if(resdata.code == rescode.success){
+            message.success(resdata.msg);
+            onPageChange(currentRef.value,pageSizeRef.value);
+          }
+          else{
+              message.warning(resdata.msg);
+          }
+        })
+        .catch(error=>{
+          if(error.response){
+            resdata = error.response.data;
+            if(resdata.code==rescode.validparamserror){
+              message.warning(resdata.result);
+            }else{
+              message.warning(resdata.msg);
+            }
+          }else if (error.request) {
+              message.warning("网络有问题，请稍后重试");
+          } else {
+              message.warning("网络有问题，请稍后重试");
+          }
+        });
+    }
 };
 
-const onUnlock = id => {
-  console.log(id);
+const onUnlockAdmin = id => {
+  let token=String(storage.get('token'))
+  if (typeof token == "undefined" || token == null || token == ""){
+      message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+  }else{
+      let resdata;
+      axios({
+          method: 'get',
+          url: apiurl+'/api/admin/unlock',
+          headers: {'Authorization': 'Bearer ' + token },
+          params: {
+                id: id
+              },
+        })
+        .then(response =>{
+          resdata = response.data;
+          if(resdata.code == rescode.success){
+            message.success(resdata.msg);
+            onPageChange(currentRef.value,pageSizeRef.value);
+          }
+          else{
+              message.warning(resdata.msg);
+          }
+        })
+        .catch(error=>{
+          if(error.response){
+              resdata = error.response.data;
+              message.warning(resdata.msg);
+          }else if (error.request) {
+              message.warning("网络有问题，请稍后重试");
+          } else {
+              message.warning("网络有问题，请稍后重试");
+          }
+        });
+    }
 };
 
-const onBottomDelete = () => {
+const onBatchDeleteAdmin = () => {
   if(selectedStatKeys.value.length<=0){
     message.warning('您没有选择任何列');
   }else{
@@ -184,19 +326,167 @@ const onBottomDelete = () => {
       okText: '确认',
       cancelText: '取消',
       onOk() {
-        console.log(selectedStatKeys.value);
+        let token=String(storage.get('token'))
+        if (typeof token == "undefined" || token == null || token == ""){
+            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+        }else{
+            let resdata;
+            axios({
+                method: 'post',
+                url: apiurl+'/api/admin/batchdelete',
+                headers: {
+                  'Content-Type': 'multipart/form-data;',
+                  'Authorization': 'Bearer ' + token 
+                },
+                data: {
+                      ids:selectedStatKeys.value
+                    },
+              })
+              .then(response =>{
+                resdata = response.data;
+                if(resdata.code == rescode.success){
+                  message.success(resdata.msg);
+                  onPageChange(currentRef.value,pageSizeRef.value);
+                }
+                else{
+                    message.warning(resdata.msg);
+                }
+              })
+              .catch(error=>{
+                if(error.response){
+                    resdata = error.response.data;
+                    if(resdata.code==rescode.validparamserror){
+                      message.warning(resdata.result);
+                    }else{
+                      message.warning(resdata.msg);
+                    }
+                }else if (error.request) {
+                    message.warning("网络有问题，请稍后重试");
+                } else {
+                    message.warning("网络有问题，请稍后重试");
+                }
+              });
+          }
       },
       onCancel() {},
     });
   }
 };
 
-const onBottomeEnable = () => {
-  console.log(selectedStatKeys.value);
+const onBatchEnableAdmin = () => {
+  if(selectedStatKeys.value.length<=0){
+    message.warning('您没有选择任何列');
+  }else{
+    Modal.confirm({
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '您确定要启用选择的用户吗',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        let token=String(storage.get('token'))
+        if (typeof token == "undefined" || token == null || token == ""){
+            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+        }else{
+            let resdata;
+            axios({
+                method: 'post',
+                url: apiurl+'/api/admin/batchendisable',
+                headers: {
+                  'Content-Type': 'multipart/form-data;',
+                  'Authorization': 'Bearer ' + token 
+                },
+                data: {
+                      ids:selectedStatKeys.value,
+                      state: 1
+                    },
+              })
+              .then(response =>{
+                resdata = response.data;
+                if(resdata.code == rescode.success){
+                  message.success(resdata.msg);
+                  onPageChange(currentRef.value,pageSizeRef.value);
+                }
+                else{
+                    message.warning(resdata.msg);
+                }
+              })
+              .catch(error=>{
+                if(error.response){
+                    resdata = error.response.data;
+                    if(resdata.code==rescode.validparamserror){
+                      message.warning(resdata.result);
+                    }else{
+                      message.warning(resdata.msg);
+                    }
+                }else if (error.request) {
+                    message.warning("网络有问题，请稍后重试");
+                } else {
+                    message.warning("网络有问题，请稍后重试");
+                }
+              });
+          }
+      },
+      onCancel() {},
+    });
+  }
 };
 
-const onBottomDisable = () => {
-  console.log(selectedStatKeys.value);
+const onBatchDisableAdmin = () => {
+  if(selectedStatKeys.value.length<=0){
+    message.warning('您没有选择任何列');
+  }else{
+    Modal.confirm({
+      icon: createVNode(ExclamationCircleOutlined),
+      content: '您确定要禁用选择的用户吗',
+      okText: '确认',
+      cancelText: '取消',
+      onOk() {
+        let token=String(storage.get('token'))
+        if (typeof token == "undefined" || token == null || token == ""){
+            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+        }else{
+            let resdata;
+            axios({
+                method: 'post',
+                url: apiurl+'/api/admin/batchendisable',
+                headers: {
+                  'Content-Type': 'multipart/form-data;',
+                  'Authorization': 'Bearer ' + token 
+                },
+                data: {
+                      ids:selectedStatKeys.value,
+                      state: 2
+                    },
+              })
+              .then(response =>{
+                resdata = response.data;
+                if(resdata.code == rescode.success){
+                  message.success(resdata.msg);
+                  onPageChange(currentRef.value,pageSizeRef.value);
+                }
+                else{
+                    message.warning(resdata.msg);
+                }
+              })
+              .catch(error=>{
+                if(error.response){
+                    resdata = error.response.data;
+                    if(resdata.code==rescode.validparamserror){
+                      message.warning(resdata.result);
+                    }else{
+                      message.warning(resdata.msg);
+                    }
+                }else if (error.request) {
+                    message.warning("网络有问题，请稍后重试");
+                } else {
+                    message.warning("网络有问题，请稍后重试");
+                }
+              });
+          }
+      },
+      onCancel() {},
+    });
+  }
 };
 
 const showAddAdminModal = () => {
@@ -227,28 +517,28 @@ const closeAddAdminModal = () => {
 
         <a-popconfirm v-if="props.menuActs.has('deleteadmin')"
           title="确定删除吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onDelete(record.id)"
+          @confirm="onDeleteAdmin(record.id)"
         >
           <a><a-tag color="red" style="cursor: pointer;">删除</a-tag></a>
         </a-popconfirm>
 
         <a-popconfirm v-if="record.state==2 && props.menuActs.has('endisableadmin')"
           title="确定启用吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onEnable(record.id)"
+          @confirm="onEnableAdmin(record.id)"
         >
           <a><a-tag color="green" style="cursor: pointer;">启用</a-tag></a>
         </a-popconfirm>
 
         <a-popconfirm v-else-if="record.state==1 && props.menuActs.has('endisableadmin')"
           title="确定禁用吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onDisable(record.id)"
+          @confirm="onDisableAdmin(record.id)"
         >
           <a><a-tag color="orange" style="cursor: pointer;">禁用</a-tag></a>
         </a-popconfirm>
 
         <a-popconfirm v-if="record.lock_state==2 && props.menuActs.has('unlockadmin')"
           title="确定解锁吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onUnlock(record.id)"
+          @confirm="onUnlockAdmin(record.id)"
         >
           <a><a-tag color="cyan" style="cursor: pointer;">解锁</a-tag></a>
         </a-popconfirm>
@@ -259,9 +549,9 @@ const closeAddAdminModal = () => {
   <a-row>
     <a-col :span="9" style="margin-top: 8px;">
       <a-button v-if="props.menuActs.has('addadmin')" type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddAdminModal">添加</a-button>
-      <a-button v-if="props.menuActs.has('deleteadmin')" type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBottomDelete">删除</a-button>
-      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBottomeEnable">启用</a-button>
-      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBottomDisable">禁用</a-button>
+      <a-button v-if="props.menuActs.has('deleteadmin')" type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBatchDeleteAdmin">删除</a-button>
+      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBatchEnableAdmin">启用</a-button>
+      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBatchDisableAdmin">禁用</a-button>
     </a-col>
     <a-col :span="15" style="margin-top: 8px; text-align: right;">
       <div>

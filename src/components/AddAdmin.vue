@@ -139,7 +139,7 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            message.success('添加成功', 1, ()=>{ 
+            message.success(resdata.msg, 1, ()=>{ 
               initFormData();
               emits("closeAddAdminModal"); 
             });

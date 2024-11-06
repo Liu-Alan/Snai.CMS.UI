@@ -181,7 +181,7 @@
         .then(response =>{
           resdata = response.data;
           if(resdata.code == rescode.success){
-            message.success('修改成功', 1, ()=>{ 
+            message.success(resdata.msg, 1, ()=>{ 
               emits("closeUpdateAdminModal"); 
             });
           }

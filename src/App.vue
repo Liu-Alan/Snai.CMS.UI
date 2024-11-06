@@ -65,7 +65,7 @@
                     if(menu.menu == 2 && menu.name !==''){
                         menuActs.value.set(menu.name,menu.router);
                     }
-                });;
+                });
             }
             else{
                 message.warning(resdata.msg);
