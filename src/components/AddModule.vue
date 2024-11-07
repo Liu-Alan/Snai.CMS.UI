@@ -6,74 +6,50 @@
     import { storage } from '@/utils/storage';
     import { apiurl,rescode } from '@/utils/globalconst';
 
-    const roles = ref([]);
-
+    var menuPas = ref([]);
+    
     const formState = reactive({
-      user_name: '',
-      password: '',
-      password2: '',
-      role_id: undefined,
+      title: '',
+      name: '',
+      parent_id: 0,
+      router: '',
+      ui_router: '',
+      sort: 1,
+      menu: 2,
       state: 1,
     });
 
-    const emits = defineEmits(['closeAddAdminModal']);
-    
+    const emits = defineEmits(['closeAddModuleModal']);
+
     const initFormData = () =>{
-      formState.user_name = '';
-      formState.password = '';
-      formState.password2 = '';
-      formState.role_id = undefined;
+      formState.title = '';
+      formState.name = '';
+      formState.parent_id = 0;
+      formState.router = '';
+      formState.ui_router = '';
+      formState.sort = 1;
+      formState.menu = 2;
       formState.state = 1;
     }
 
-    const checkRePassword = (_, value) => {
-      if (value == '') {
-        return Promise.reject(new Error('请输入确认密码'));
-      }else if(value !== formState.password){
-        return Promise.reject(new Error('确认密码与密码不一致'));
-      }else{
-        return Promise.resolve();
-      }
-    };
-
     const rules = {
-        user_name: [
+        title: [
             {
               required: true,
-              message: '请输入用户名',
+              message: '请输入名称',
               trigger: 'change',
             },
             {
-              min: 4,
+              min: 2,
               max: 32,
-              message: '用户名长度为4到32位',
+              message: '名称长度为2到32位',
               trigger: 'blur',
             },
         ],
-        password: [
+        menu: [
             {
               required: true,
-              message: '请输入密码',
-              trigger: 'change',
-            },
-            {
-              min: 6,
-              max: 20,
-              message: '密码长度为6到20位',
-              trigger: 'blur',
-            },
-        ],
-        password2: [
-            {
-              required: true,
-              validator: checkRePassword,
-              trigger: 'change',
-            },
-        ],
-        role_id: [
-            {
-              required: true,
-              message: '请选择角色',
+              message: '请选择是否菜单',
               trigger: 'change',
             },
         ],
@@ -87,21 +63,26 @@
     }
 
     onBeforeMount(()=>{
-        let token=String(storage.get('token'));
+        let token=String(storage.get('token'))
         if (typeof token == "undefined" || token == null || token == ""){
-            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
+            message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/' });
         }else{
             let resdata;
             axios({
                 method: 'get',
-                url: apiurl+'/api/home/role',
+                url: apiurl+'/api/home/menu',
                 headers: {'Authorization': 'Bearer ' + token }
             })
             .then(response =>{
                 resdata = response.data;
                 if(resdata.code == rescode.success){
-                    roles.value = resdata.result;
-                }else{
+                    resdata.result.forEach(menu => {
+                        if(menu.menu == 1){
+                            menuPas.value.push(menu);
+                        }
+                    });
+                }
+                else{
                     message.warning(resdata.msg);
                 }
             })
@@ -110,12 +91,13 @@
                     resdata = error.response.data;
                     if(resdata.code >= rescode.authcheckfail && resdata.code <= rescode.authformatfail){
                         message.warning(resdata.msg, 2, ()=>{ window.location.href = '/logon/' });
-                    }else{
+                    }
+                    else{
                         message.warning(resdata.msg);
                     }
-                }else if(error.request) {
+                }else if (error.request) {
                     message.warning("网络有问题，请稍后重试");
-                }else{
+                } else {
                     message.warning("网络有问题，请稍后重试");
                 }
             });
@@ -130,7 +112,7 @@
         let resdata;
         axios({
           method: 'post',
-          url: apiurl+'/api/admin/add',
+          url: apiurl+'/api/module/add',
           data: values,
           headers: {
             'Content-Type': 'multipart/form-data;',
@@ -142,7 +124,7 @@
           if(resdata.code == rescode.success){
             message.success(resdata.msg, 1, ()=>{ 
               initFormData();
-              emits("closeAddAdminModal"); 
+              emits("closeAddModuleModal"); 
             });
           }
           else{
@@ -182,33 +164,58 @@
       :wrapper-col="{ span: 19 }"
     >
       <a-form-item
-        label="用户名"
-        name="user_name"
+        label="名称"
+        name="title"
         style="margin-top: 20px;"
       >
-        <a-input v-model:value="formState.user_name" placeholder="用户名" />
+        <a-input v-model:value="formState.title" placeholder="名称" />
       </a-form-item>
   
       <a-form-item
-        label="密码"
-        name="password"
+        label="前端名称"
+        name="name"
         style="margin-top: 5px;"
       >
-        <a-input-password v-model:value="formState.password" placeholder="密码" />
+        <a-input v-model:value="formState.name" placeholder="前端名称" />
+      </a-form-item>
+
+      <a-form-item label="父模块" name="parent_id">
+        <a-select v-model:value="formState.parent_id" placeholder="请选择父模块">
+            <a-select-option :value="0">--</a-select-option>
+            <a-select-option v-for="menuP in menuPas" :value="menuP.id"><span v-if="menuP.parent_id>0">-- </span>{{ menuP.title }}</a-select-option>
+            <a-select-option :value="-1"><span style="color: #999;">不验证权限</span></a-select-option>
+        </a-select>
       </a-form-item>
 
       <a-form-item
-        label="确认密码"
-        name="password2"
+        label="api路由"
+        name="router"
         style="margin-top: 5px;"
       >
-        <a-input-password v-model:value="formState.password2" placeholder="确认密码" />
+        <a-input v-model:value="formState.router" placeholder="api路由" />
       </a-form-item>
 
-      <a-form-item label="角色" name="role_id">
-        <a-select v-model:value="formState.role_id" placeholder="请选择角色">
-            <a-select-option v-for="role in roles" :value="role.id">{{ role.title }}</a-select-option>
-        </a-select>
+      <a-form-item
+        label="前端路由"
+        name="ui_router"
+        style="margin-top: 5px;"
+      >
+        <a-input v-model:value="formState.ui_router" placeholder="前端路由" />
+      </a-form-item>
+
+      <a-form-item
+        label="排序"
+        name="sort"
+        style="margin-top: 5px;"
+      >
+        <a-input v-model:value="formState.sort" placeholder="排序" />
+      </a-form-item>
+
+      <a-form-item label="菜单" name="menu">
+        <a-radio-group v-model:value="formState.menu">
+            <a-radio :value="1">是</a-radio>
+            <a-radio :value="2">否</a-radio>
+        </a-radio-group>
       </a-form-item>
 
       <a-form-item label="状态" name="state">
@@ -217,7 +224,7 @@
             <a-radio :value="2">禁用</a-radio>
         </a-radio-group>
       </a-form-item>
-      
+
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
             <a-button type="primary" html-type="submit">添 加</a-button>

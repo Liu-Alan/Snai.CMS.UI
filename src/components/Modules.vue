@@ -8,15 +8,15 @@ import { message, Modal } from 'ant-design-vue';
 import { storage } from '@/utils/storage';
 import { apiurl,rescode } from '@/utils/globalconst';
 
-import AddAdmin from './AddAdmin.vue'
-import UpdateAdmin from './UpdateAdmin.vue'
+import AddModule from './AddModule.vue'
+import UpdateModule from './UpdateModule.vue'
 
 const props = defineProps({
   routerUrl: String,
   menuActs: Map
 })
 
-const adminID = ref(0);
+const moduleID = ref(0);
 
 const columns = [
   {
@@ -24,20 +24,24 @@ const columns = [
     dataIndex: 'id',
   },
   {
-    title: '用户名',
-    dataIndex: 'user_name',
+    title: '父模块',
+    dataIndex: 'parent_title',
   },
   {
-    title: '角色',
-    dataIndex: 'role',
+    title: '名称',
+    dataIndex: 'title',
+  },
+  {
+    title: '前端名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '菜单',
+    dataIndex: 'menu',
   },
   {
     title: '状态',
     dataIndex: 'state',
-  },
-  {
-    title: '锁定',
-    dataIndex: 'lock_state',
   },
   {
     title: '操作',
@@ -51,8 +55,8 @@ const currentRef = ref(1);
 const pageSizeRef = ref(10);
 const pageSizeOptions = ref(['10', '20', '50']);
 const total = ref(0);
-const openAddAdminModal = ref(false);
-const openUpdateAdminModal = ref(false);
+const openAddModuleModal = ref(false);
+const openUpdateModuleModal = ref(false);
 
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
@@ -148,17 +152,17 @@ const onSelectChange = selectedRowKeys => {
   selectedStatKeys.value = selectedRowKeys;
 };
 
-const showUpdateAdminModal = id => {
-  adminID.value = id;
-  openUpdateAdminModal.value = true;
+const showUpdateModuleModal = id => {
+  moduleID.value = id;
+  openUpdateModuleModal.value = true;
 };
 
-const closeUpdateAdminModal = () => {
-  openUpdateAdminModal.value = false;
+const closeUpdateModuleModal = () => {
+  openUpdateModuleModal.value = false;
   onPageChange(currentRef.value,pageSizeRef.value);
 };
 
-const onDeleteAdmin = id => {
+const onDeleteModule = id => {
   let token=String(storage.get('token'))
   if (typeof token == "undefined" || token == null || token == ""){
       message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
@@ -166,7 +170,7 @@ const onDeleteAdmin = id => {
       let resdata;
       axios({
           method: 'get',
-          url: apiurl+'/api/admin/delete',
+          url: apiurl+'/api/module/delete',
           headers: {'Authorization': 'Bearer ' + token },
           params: {
                 id: id
@@ -195,7 +199,7 @@ const onDeleteAdmin = id => {
     }
 };
 
-const onEnableAdmin = id => {
+const onEnableModule = id => {
   let token=String(storage.get('token'))
   if (typeof token == "undefined" || token == null || token == ""){
       message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
@@ -203,7 +207,7 @@ const onEnableAdmin = id => {
       let resdata;
       axios({
           method: 'post',
-          url: apiurl+'/api/admin/endisable',
+          url: apiurl+'/api/module/endisable',
           headers: {'Authorization': 'Bearer ' + token },
           params: {
                 id: id,
@@ -237,7 +241,7 @@ const onEnableAdmin = id => {
     }
 };
 
-const onDisableAdmin = id => {
+const onDisableModule = id => {
   let token=String(storage.get('token'))
   if (typeof token == "undefined" || token == null || token == ""){
       message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
@@ -245,7 +249,7 @@ const onDisableAdmin = id => {
       let resdata;
       axios({
           method: 'post',
-          url: apiurl+'/api/admin/endisable',
+          url: apiurl+'/api/module/endisable',
           headers: {'Authorization': 'Bearer ' + token },
           params: {
                 id: id,
@@ -279,44 +283,7 @@ const onDisableAdmin = id => {
     }
 };
 
-const onUnlockAdmin = id => {
-  let token=String(storage.get('token'))
-  if (typeof token == "undefined" || token == null || token == ""){
-      message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
-  }else{
-      let resdata;
-      axios({
-          method: 'get',
-          url: apiurl+'/api/admin/unlock',
-          headers: {'Authorization': 'Bearer ' + token },
-          params: {
-                id: id
-              },
-        })
-        .then(response =>{
-          resdata = response.data;
-          if(resdata.code == rescode.success){
-            message.success(resdata.msg);
-            onPageChange(currentRef.value,pageSizeRef.value);
-          }
-          else{
-              message.warning(resdata.msg);
-          }
-        })
-        .catch(error=>{
-          if(error.response){
-              resdata = error.response.data;
-              message.warning(resdata.msg);
-          }else if (error.request) {
-              message.warning("网络有问题，请稍后重试");
-          } else {
-              message.warning("网络有问题，请稍后重试");
-          }
-        });
-    }
-};
-
-const onBatchDeleteAdmin = () => {
+const onBatchDeleteModule = () => {
   if(selectedStatKeys.value.length<=0){
     message.warning('您没有选择任何列');
   }else{
@@ -333,7 +300,7 @@ const onBatchDeleteAdmin = () => {
             let resdata;
             axios({
                 method: 'post',
-                url: apiurl+'/api/admin/batchdelete',
+                url: apiurl+'/api/module/batchdelete',
                 headers: {
                   'Content-Type': 'multipart/form-data;',
                   'Authorization': 'Bearer ' + token 
@@ -373,7 +340,7 @@ const onBatchDeleteAdmin = () => {
   }
 };
 
-const onBatchEnableAdmin = () => {
+const onBatchEnableModule = () => {
   if(selectedStatKeys.value.length<=0){
     message.warning('您没有选择任何列');
   }else{
@@ -390,7 +357,7 @@ const onBatchEnableAdmin = () => {
             let resdata;
             axios({
                 method: 'post',
-                url: apiurl+'/api/admin/batchendisable',
+                url: apiurl+'/api/module/batchendisable',
                 headers: {
                   'Content-Type': 'multipart/form-data;',
                   'Authorization': 'Bearer ' + token 
@@ -431,7 +398,7 @@ const onBatchEnableAdmin = () => {
   }
 };
 
-const onBatchDisableAdmin = () => {
+const onBatchDisableModule = () => {
   if(selectedStatKeys.value.length<=0){
     message.warning('您没有选择任何列');
   }else{
@@ -448,7 +415,7 @@ const onBatchDisableAdmin = () => {
             let resdata;
             axios({
                 method: 'post',
-                url: apiurl+'/api/admin/batchendisable',
+                url: apiurl+'/api/module/batchendisable',
                 headers: {
                   'Content-Type': 'multipart/form-data;',
                   'Authorization': 'Bearer ' + token 
@@ -489,12 +456,12 @@ const onBatchDisableAdmin = () => {
   }
 };
 
-const showAddAdminModal = () => {
-  openAddAdminModal.value = true;
+const showAddModuleModal = () => {
+  openAddModuleModal.value = true;
 };
   
-const closeAddAdminModal = () => {
-  openAddAdminModal.value = false;
+const closeAddModuleModal = () => {
+  openAddModuleModal.value = false;
   onPageChange(currentRef.value,pageSizeRef.value);
 };
 </script>
@@ -503,55 +470,48 @@ const closeAddAdminModal = () => {
   <a-table bordered :data-source="dataSource" :columns="columns" :pagination="false" 
     :row-selection="{ selectedRowKeys: selectedStatKeys, onChange: onSelectChange }">
     <template #bodyCell="{ column, record }">
+      <template v-if="column.dataIndex === 'menu'">
+        <a-tag v-show="record.menu==1" color="green">是</a-tag>
+        <a-tag v-show="record.menu==2">否</a-tag>
+      </template>
       <template v-if="column.dataIndex === 'state'">
         <a-tag v-show="record.state==1" color="green">启用</a-tag>
         <a-tag v-show="record.state==2" color="orange">禁用</a-tag>
       </template>
-      <template v-if="column.dataIndex === 'lock_state'">
-        <a-tag v-show="record.lock_state==1" color="green">未锁定</a-tag>
-        <a-tag v-show="record.lock_state==2" color="orange">锁定</a-tag>
-      </template>
 
       <template v-else-if="column.dataIndex === 'operation'">
-        <a v-if="props.menuActs.has('updateadmin')"><a-tag color="blue"  @click="showUpdateAdminModal(record.id)" style="cursor: pointer;">修改</a-tag></a>
+        <a v-if="props.menuActs.has('updatemodule')"><a-tag color="blue"  @click="showUpdateModuleModal(record.id)" style="cursor: pointer;">修改</a-tag></a>
 
-        <a-popconfirm v-if="props.menuActs.has('deleteadmin')"
+        <a-popconfirm v-if="props.menuActs.has('deletemodule')"
           title="确定删除吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onDeleteAdmin(record.id)"
+          @confirm="onDeleteModule(record.id)"
         >
           <a><a-tag color="red" style="cursor: pointer;">删除</a-tag></a>
         </a-popconfirm>
 
-        <a-popconfirm v-if="record.state==2 && props.menuActs.has('endisableadmin')"
+        <a-popconfirm v-if="record.state==2 && props.menuActs.has('endisablemodule')"
           title="确定启用吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onEnableAdmin(record.id)"
+          @confirm="onEnableModule(record.id)"
         >
           <a><a-tag color="green" style="cursor: pointer;">启用</a-tag></a>
         </a-popconfirm>
 
-        <a-popconfirm v-else-if="record.state==1 && props.menuActs.has('endisableadmin')"
+        <a-popconfirm v-else-if="record.state==1 && props.menuActs.has('endisablemodule')"
           title="确定禁用吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onDisableAdmin(record.id)"
+          @confirm="onDisableModule(record.id)"
         >
           <a><a-tag color="orange" style="cursor: pointer;">禁用</a-tag></a>
         </a-popconfirm>
 
-        <a-popconfirm v-if="record.lock_state==2 && props.menuActs.has('unlockadmin')"
-          title="确定解锁吗?" ok-text="确定" cancel-text="取消"
-          @confirm="onUnlockAdmin(record.id)"
-        >
-          <a><a-tag color="cyan" style="cursor: pointer;">解锁</a-tag></a>
-        </a-popconfirm>
-        <a-tag v-else-if="record.lock_state==1 && props.menuActs.has('unlockadmin')" style="color: #999;">解锁</a-tag>
       </template>
     </template>
   </a-table>
   <a-row>
     <a-col :span="9" style="margin-top: 8px;">
-      <a-button v-if="props.menuActs.has('addadmin')" type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddAdminModal">添加</a-button>
-      <a-button v-if="props.menuActs.has('deleteadmin')" type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBatchDeleteAdmin">删除</a-button>
-      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBatchEnableAdmin">启用</a-button>
-      <a-button v-if="props.menuActs.has('endisableadmin')" type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBatchDisableAdmin">禁用</a-button>
+      <a-button v-if="props.menuActs.has('addmodule')" type="ghost" class="button-color-daybreak" style="margin-right: 5px;" @click="showAddModuleModal">添加</a-button>
+      <a-button v-if="props.menuActs.has('deletemodule')" type="ghost" class="button-color-volcano" style="margin-right: 5px;" @click="onBatchDeleteModule">删除</a-button>
+      <a-button v-if="props.menuActs.has('endisablemodule')" type="ghost" class="button-color-green" style="margin-right: 5px;" @click="onBatchEnableModule">启用</a-button>
+      <a-button v-if="props.menuActs.has('endisablemodule')" type="ghost" class="button-color-sunset" style="margin-right: 5px;" @click="onBatchDisableModule">禁用</a-button>
     </a-col>
     <a-col :span="15" style="margin-top: 8px; text-align: right;">
       <div>
@@ -570,13 +530,13 @@ const closeAddAdminModal = () => {
     </a-col>
   </a-row>
   <template>
-    <a-modal v-model:open="openAddAdminModal" width="400px" title="添加用户" :footer="null" :maskClosable="false">
-      <add-admin @closeAddAdminModal="closeAddAdminModal"></add-admin>
+    <a-modal v-model:open="openAddModuleModal" width="400px" title="添加模块" :footer="null" :maskClosable="false">
+      <add-module @closeAddModuleModal="closeAddModuleModal"></add-module>
     </a-modal>
   </template>
   <template>
-    <a-modal v-model:open="openUpdateAdminModal" width="400px" title="修改用户" :footer="null" :maskClosable="false">
-      <update-admin :adminID="adminID" @closeUpdateAdminModal="closeUpdateAdminModal"></update-admin>
+    <a-modal v-model:open="openUpdateModuleModal" width="400px" title="修改模块" :footer="null" :maskClosable="false">
+      <update-module :moduleID="moduleID" @closeUpdateModuleModal="closeUpdateModuleModal"></update-module>
     </a-modal>
   </template>
 </template>

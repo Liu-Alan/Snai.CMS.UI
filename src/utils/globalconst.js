@@ -21,5 +21,6 @@ export const rescode = {
 }
 
 export const routerPath = new Map([
-	['/admins', {name:"admins", parent:"manage", router:"/api/admin/list"}]
+	['/admins', {name:"admins", parent:"manage", router:"/api/admin/list"}],
+	['/modules', {name:"modules", parent:"manage", router:"/api/module/list"}]
 ])	
