@@ -1,5 +1,6 @@
 // 全局变量
 export const apiurl = 'http://localhost:8024'
+
 export const rescode = {
     success          : 200,
     fail             : 100,
@@ -22,5 +23,6 @@ export const rescode = {
 
 export const routerPath = new Map([
 	['/admins', {name:"admins", parent:"manage", router:"/api/admin/list"}],
-	['/modules', {name:"modules", parent:"manage", router:"/api/module/list"}]
+	['/modules', {name:"modules", parent:"manage", router:"/api/module/list"}],
+	['/roles', {name:"roles", parent:"manage", router:"/api/role/list"}],
 ])	

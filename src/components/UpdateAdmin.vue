@@ -19,7 +19,7 @@
       state: 1,
     });
 
-    const emits = defineEmits(['closeAddAdminModal']);
+    const emits = defineEmits(['closeUpdateAdminModal']);
     const roles = ref([]);
 
     const checkRePassword = (_, value) => {
@@ -260,7 +260,7 @@
             <a-radio :value="2">禁用</a-radio>
         </a-radio-group>
       </a-form-item>
-      
+
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
             <a-button type="primary" html-type="submit">修 改</a-button>
