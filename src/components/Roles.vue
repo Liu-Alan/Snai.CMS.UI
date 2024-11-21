@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onBeforeMount, createVNode } from 'vue';
+import { useRouter } from 'vue-router'
 import axios from 'axios';
 
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
@@ -10,6 +11,9 @@ import { apiurl,rescode } from '@/utils/globalconst';
 
 import AddRole from './AddRole.vue'
 import UpdateRole from './UpdateRole.vue'
+import AssignPerm from './AssignPerm.vue'
+
+const router = useRouter();
 
 const props = defineProps({
   routerUrl: String,
@@ -45,6 +49,7 @@ const pageSizeOptions = ref(['10', '20', '50']);
 const total = ref(0);
 const openAddRoleModal = ref(false);
 const openUpdateRoleModal = ref(false);
+const openAssignPermModal = ref(false);
 
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
@@ -148,6 +153,16 @@ const showUpdateRoleModal = id => {
 const closeUpdateRoleModal = () => {
   openUpdateRoleModal.value = false;
   onPageChange(currentRef.value,pageSizeRef.value);
+};
+
+const showAssignPermModal = id => {
+  roleID.value = id;
+  openAssignPermModal.value = true;
+};
+
+const closeAssignPermModal = () => {
+  openAssignPermModal.value = false;
+  router.go(0);
 };
 
 const onDeleteRole = id => {
@@ -486,6 +501,8 @@ const closeAddRoleModal = () => {
         >
           <a><a-tag color="orange" style="cursor: pointer;">禁用</a-tag></a>
         </a-popconfirm>
+
+        <a v-if="props.menuActs.has('assignperm')"><a-tag color="cyan"  @click="showAssignPermModal(record.id)" style="cursor: pointer;">权限</a-tag></a>
       </template>
     </template>
   </a-table>
@@ -520,6 +537,11 @@ const closeAddRoleModal = () => {
   <template>
     <a-modal v-model:open="openUpdateRoleModal" width="400px" title="修改角色" :footer="null" :maskClosable="false">
       <update-role :roleID="roleID" @closeUpdateRoleModal="closeUpdateRoleModal"></update-role>
+    </a-modal>
+  </template>
+  <template>
+    <a-modal v-model:open="openAssignPermModal" width="570px" title="分配权限" :footer="null" :maskClosable="false">
+      <assign-perm :roleID="roleID" @closeAssignPermModal="closeAssignPermModal"></assign-perm>
     </a-modal>
   </template>
 </template>

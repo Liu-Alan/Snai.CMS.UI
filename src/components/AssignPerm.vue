@@ -1,5 +1,5 @@
 <script setup>
-    import { reactive,ref,onBeforeMount,onMounted,onUpdated } from 'vue';
+    import { ref, reactive, onMounted, onUpdated, onBeforeMount } from 'vue';
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
@@ -7,54 +7,19 @@
     import { apiurl,rescode } from '@/utils/globalconst';
 
     const props = defineProps({
-      moduleID: Number
+      roleID: Number
     })
 
-    var menuPas = ref([]);
-
     const formState = reactive({
-      id: 0,
-      title: '',
-      name: '',
-      parent_id: undefined,
-      router: '',
-      ui_router: '',
-      sort: 1,
-      menu: 2,
-      state: 1,
+      role_id: 0,
+      module_ids: [],
     });
 
-    const emits = defineEmits(['closeUpdateModuleModal']);
+    var menuPas = ref([]);
+    var menuSubs = ref([]);
+    var menuActs = ref([]);
 
-    const rules = {
-        title: [
-            {
-              required: true,
-              message: '请输入名称',
-              trigger: 'change',
-            },
-            {
-              min: 2,
-              max: 32,
-              message: '名称长度为2到32位',
-              trigger: 'blur',
-            },
-        ],
-        menu: [
-            {
-              required: true,
-              message: '请选择是否菜单',
-              trigger: 'change',
-            },
-        ],
-        state: [
-            {
-              required: true,
-              message: '请选择状态',
-              trigger: 'change',
-            },
-        ]
-    }
+    const emits = defineEmits(['closeAssignPermModal']);
 
     onBeforeMount(()=>{
         let token=String(storage.get('token'));
@@ -64,18 +29,25 @@
             let resdata;
             axios({
                 method: 'get',
-                url: apiurl+'/api/home/menu',
+                url: apiurl+'/api/module/getlist',
                 headers: {'Authorization': 'Bearer ' + token }
             })
             .then(response =>{
                 resdata = response.data;
                 if(resdata.code == rescode.success){
                     resdata.result.forEach(menu => {
-                        if(menu.menu == 1){
+                        if(menu.menu == 1 && menu.parent_id==0){
                             menuPas.value.push(menu);
                         }
+                        if(menu.menu == 1 && menu.parent_id>0){
+                            menuSubs.value.push(menu);
+                        }
+                        if(menu.menu == 2 && menu.name !==''){
+                            menuActs.value.push(menu);
+                        }
                     });
-                }else{
+                }
+                else{
                     message.warning(resdata.msg);
                 }
             })
@@ -96,7 +68,7 @@
         }
     })
 
-    const GetModule = (id) =>{
+    const GetRoleModules = (roleID) =>{
         let token=String(storage.get('token'));
         if (typeof token == "undefined" || token == null || token == ""){
             message.warning('没有权限或已过期', 2, ()=>{ window.location.href = '/logon/' });
@@ -104,23 +76,17 @@
             let resdata;
             axios({
                 method: 'get',
-                url: apiurl+'/api/module/get',
+                url: apiurl+'/api/role/rolemodules',
                 headers: {'Authorization': 'Bearer ' + token },
                 params: {
-                  id: id
+                    role_id: roleID
                 },
             })
             .then(response =>{
                 resdata = response.data;
                 if(resdata.code == rescode.success){
-                    formState.title = resdata.result.title;
-                    formState.name = resdata.result.name;
-                    formState.parent_id = resdata.result.parent_id;
-                    formState.router = resdata.result.router;
-                    formState.ui_router = resdata.result.ui_router;
-                    formState.sort = resdata.result.sort;
-                    formState.menu = resdata.result.menu;
-                    formState.state = resdata.result.state;
+                    formState.role_id = roleID;
+                    formState.module_ids = resdata.result;
                 }else{
                     message.warning(resdata.msg);
                 }
@@ -143,13 +109,13 @@
     }
 
     onMounted(()=>{
-        formState.id=props.moduleID;
-        GetModule(props.moduleID);
+        formState.role_id=props.roleID;
+        GetRoleModules(props.roleID);
     })
 
     onUpdated(()=>{
-        formState.id=props.adminID;
-        GetModule(props.moduleID);
+        formState.role_id=props.roleID;
+        GetRoleModules(props.roleID);
     })
 
     const onFinish = values => {
@@ -160,7 +126,7 @@
         let resdata;
         axios({
           method: 'post',
-          url: apiurl+'/api/module/update',
+          url: apiurl+'/api/role/assignperm',
           data: values,
           headers: {
             'Content-Type': 'multipart/form-data;',
@@ -171,7 +137,7 @@
           resdata = response.data;
           if(resdata.code == rescode.success){
             message.success(resdata.msg, 1, ()=>{ 
-              emits("closeUpdateModuleModal"); 
+              emits("closeAssignPermModal"); 
             });
           }
           else{
@@ -204,82 +170,36 @@
     <a-form
       :model="formState"
       name="basic"
-      :rules="rules"
       @finish="onFinish"
       @finishFailed="onFinishFailed"
-      :label-col="{ span: 5 }"
-      :wrapper-col="{ span: 19 }"
     >
       <a-form-item v-show="false"
-        name="id"
+        name="role_id"
       >
-        <a-input v-model:value="formState.id" :disabled="true" />
-      </a-form-item>
-
-      <a-form-item
-        label="名称"
-        name="title"
-        style="margin-top: 20px;"
-      >
-        <a-input v-model:value="formState.title" placeholder="名称" />
+        <a-input v-model:value="formState.role_id" :disabled="true" />
       </a-form-item>
   
-      <a-form-item
-        label="前端名称"
-        name="name"
-        style="margin-top: 5px;"
-      >
-        <a-input v-model:value="formState.name" placeholder="前端名称" />
+      <a-form-item name="module_ids">
+        <a-checkbox-group v-model:value="formState.module_ids">
+          <a-card v-for="menuP in menuPas">
+            <a-checkbox :value="menuP.id" name="module_ids">{{menuP.title}}</a-checkbox>
+            <br />
+            <template v-for="menuS in menuSubs">
+              <a-checkbox v-if="menuS.parent_id==menuP.id" :value="menuS.id" name="module_ids" style="margin-left: 10px;">{{menuS.title}}</a-checkbox>
+              <br />
+              <div style="margin-left: 20px;">
+                <template v-for="menuA in menuActs">
+                    <a-checkbox v-if="menuA.parent_id==menuS.id" :value="menuA.id" name="module_ids">{{menuA.title}}</a-checkbox>   
+                </template>
+              </div>
+            </template>
+          </a-card>
+        </a-checkbox-group>
       </a-form-item>
-      <a-form-item label="父模块" name="parent_id">
-        <a-select v-model:value="formState.parent_id" placeholder="请选择父模块">
-            <a-select-option :value="0">--</a-select-option>
-            <a-select-option v-for="menuP in menuPas" :value="menuP.id"><span v-if="menuP.parent_id>0">-- </span>{{ menuP.title }}</a-select-option>
-            <a-select-option :value="-1"><span style="color: #999;">不验证权限</span></a-select-option>
-        </a-select>
-      </a-form-item>
-
-      <a-form-item
-        label="api路由"
-        name="router"
-        style="margin-top: 5px;"
-      >
-        <a-input v-model:value="formState.router" placeholder="api路由" />
-      </a-form-item>
-
-      <a-form-item
-        label="前端路由"
-        name="ui_router"
-        style="margin-top: 5px;"
-      >
-        <a-input v-model:value="formState.ui_router" placeholder="前端路由" />
-      </a-form-item>
-
-      <a-form-item
-        label="排序"
-        name="sort"
-        style="margin-top: 5px;"
-      >
-        <a-input v-model:value="formState.sort" placeholder="排序" />
-      </a-form-item>
-
-      <a-form-item label="菜单" name="menu">
-        <a-radio-group v-model:value="formState.menu">
-            <a-radio :value="1">是</a-radio>
-            <a-radio :value="2">否</a-radio>
-        </a-radio-group>
-      </a-form-item>
-
-      <a-form-item label="状态" name="state">
-        <a-radio-group v-model:value="formState.state">
-            <a-radio :value="1">启用</a-radio>
-            <a-radio :value="2">禁用</a-radio>
-        </a-radio-group>
-      </a-form-item>
-
+      
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
-            <a-button type="primary" html-type="submit">修 改</a-button>
+            <a-button type="primary" html-type="submit">提 交</a-button>
         </a-form-item>
       </a-row>
     </a-form>

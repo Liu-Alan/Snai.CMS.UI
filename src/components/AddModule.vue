@@ -140,9 +140,9 @@
               message.warning(resdata.msg);
             }
           }else if (error.request) {
-            message.warning("原密码错误，请稍后再试");
+            message.warning("网络有问题，请稍后再试");
           } else {
-            message.warning("原密码错误，请稍后再试");
+            message.warning("网络有问题，请稍后再试");
           }
         });
       }
