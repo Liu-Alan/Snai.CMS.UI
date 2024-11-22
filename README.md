@@ -15,12 +15,12 @@
 对应后端仓库：[https://github.com/Liu-Alan/Snai.CMS.Api](https://github.com/Liu-Alan/Snai.CMS.Api)  
 
 ### 界面展示  
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/logon.jpg" width="50%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/logon.jpg" width="45%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/pwd.jpg" width="40%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/pwd.jpg" width="60%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/user.jpg" width="40%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/user.jpg" width="60%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/module.jpg" width="40%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/module.jpg" width="60%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="40%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="60%" />  
