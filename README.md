@@ -13,15 +13,16 @@
     -------账号管理  
     ----------------添/删/改等账号 
     
-### 对应后端仓库：### [https://github.com/Liu-Alan/Snai.CMS.Api](https://github.com/Liu-Alan/Snai.CMS.Api)  
+### 对应后端仓库
+    [https://github.com/Liu-Alan/Snai.CMS.Api](https://github.com/Liu-Alan/Snai.CMS.Api)  
 
 ### 界面展示  
 <img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/logon.jpg" width="45%" />  
 
 <img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/pwd.jpg" width="70%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/user.jpg" width="90%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/user.jpg" width="95%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/module.jpg" width="90%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/module.jpg" width="95%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="90%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="95%" />  
