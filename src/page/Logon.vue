@@ -3,7 +3,7 @@
     import { message } from 'ant-design-vue';
     import axios from 'axios';
 
-    import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
+    import { UserOutlined, LockOutlined, SafetyOutlined } from '@ant-design/icons-vue';
 
     import { storage } from '@/utils/storage';
     import { apiurl,rescode } from '@/utils/globalconst';
@@ -11,6 +11,7 @@
     const formState = reactive({
       user_name: '',
       password: '',
+      otp_code: '',
     });
     const onFinish = values => {
       let resdata;
@@ -32,7 +33,18 @@
           }
         })
         .catch(error=>{
-          message.warning('账号或密码错误，请稍后再试');
+          if(error.response){
+              resdata = error.response.data;
+              if(resdata.code==rescode.validparamserror){
+                message.warning(resdata.result);
+              }else{
+                message.warning(resdata.msg);
+              }
+          }else if (error.request) {
+              message.warning("账号或密码错误，请稍后再试");
+          } else {
+              message.warning("账号或密码错误，请稍后再试");
+          }
         });
     };
 
@@ -71,6 +83,18 @@
           </template>
         </a-input-password>
       </a-form-item>
+
+      <a-form-item
+        name="otp_code"
+        :rules="[{ required: true, len: 6, message: '请输入otp动态码!' }]"
+      >
+        <a-input v-model:value="formState.otp_code" :maxlength="6" placeholder="otp动态码" size="large" style="margin-top: 5px;">
+          <template #prefix>
+            <SafetyOutlined class="site-form-item-icon" />
+          </template>
+        </a-input>
+      </a-form-item>
+
       <a-row justify="center">
         <a-form-item style="margin-top: 5px;">
             <a-button type="primary" html-type="submit" size="large">登 录</a-button>

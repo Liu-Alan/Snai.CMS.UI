@@ -10,6 +10,7 @@ import { apiurl,rescode } from '@/utils/globalconst';
 
 import AddAdmin from './AddAdmin.vue'
 import UpdateAdmin from './UpdateAdmin.vue'
+import OtpCode from './OtpCode.vue'
 
 const props = defineProps({
   routerUrl: String,
@@ -17,6 +18,7 @@ const props = defineProps({
 })
 
 const adminID = ref(0);
+const adminUserName = ref('');
 
 const columns = [
   {
@@ -53,6 +55,7 @@ const pageSizeOptions = ref(['10', '20', '50']);
 const total = ref(0);
 const openAddAdminModal = ref(false);
 const openUpdateAdminModal = ref(false);
+const openOtpCodeModal = ref(false);
 
 onBeforeMount(()=>{
     let token=String(storage.get('token'));
@@ -497,6 +500,16 @@ const closeAddAdminModal = () => {
   openAddAdminModal.value = false;
   onPageChange(currentRef.value,pageSizeRef.value);
 };
+
+const showOtpCodeModal = (id,userName) => {
+  adminID.value = id;
+  adminUserName.value = userName;
+  openOtpCodeModal.value = true;
+};
+  
+const closeOtpCodeModal = () => {
+  openOtpCodeModal.value = false;
+};
 </script>
 
 <template>
@@ -543,6 +556,8 @@ const closeAddAdminModal = () => {
           <a><a-tag color="cyan" style="cursor: pointer;">解锁</a-tag></a>
         </a-popconfirm>
         <a-tag v-else-if="record.lock_state==1 && props.menuActs.has('unlockadmin')" style="color: #999;">解锁</a-tag>
+
+        <a v-if="props.menuActs.has('addadmin')"><a-tag color="geekblue"  @click="showOtpCodeModal(record.id,record.user_name)" style="cursor: pointer;">otp码</a-tag></a>
       </template>
     </template>
   </a-table>
@@ -577,6 +592,11 @@ const closeAddAdminModal = () => {
   <template>
     <a-modal v-model:open="openUpdateAdminModal" width="400px" title="修改用户" :footer="null" :maskClosable="false">
       <update-admin :adminID="adminID" @closeUpdateAdminModal="closeUpdateAdminModal"></update-admin>
+    </a-modal>
+  </template>
+  <template>
+    <a-modal v-model:open="openOtpCodeModal" width="280px" :title="adminUserName+'二维码'" :footer="null" :maskClosable="false">
+      <otp-code :adminID="adminID" @closeOtpCodeModal="closeOtpCodeModal"></otp-code>
     </a-modal>
   </template>
 </template>
