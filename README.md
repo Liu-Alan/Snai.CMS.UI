@@ -15,7 +15,7 @@
 
 ### 账密与密钥  
     用户名：snai，密码：snai2024  
-    otp密钥：IFLDIRSPINAU4NKHKRMEIU2VGIZFUOBVKJKUKOCRGE3DKRCCGJGA====  
+    otp密钥：IFLDIRSPINAU4NKHKRMEIU2VGIZFUOBVKJKUKOCRGE3DKRCCGJGA  
 
     首次使用时需绑定管理员账号获取otp动态码，以后管理员可以通过 "用户管理">"opt码" 来扫码添加：  
     1. 下载安装验证器  
@@ -31,7 +31,7 @@
        1. 扫描otp二维码绑定   
        2. 添加账号绑定  
           账户名称：snai_cms:snai  
-          密钥：IFLDIRSPINAU4NKHKRMEIU2VGIZFUOBVKJKUKOCRGE3DKRCCGJGA====  
+          密钥：IFLDIRSPINAU4NKHKRMEIU2VGIZFUOBVKJKUKOCRGE3DKRCCGJGA  
     
 **对应后端仓库：** [https://github.com/Liu-Alan/Snai.CMS.Api](https://github.com/Liu-Alan/Snai.CMS.Api)  
 
