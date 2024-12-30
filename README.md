@@ -44,4 +44,4 @@
 
 <img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/module.jpg" width="95%" />  
 
-<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="95%" />  
+<img src="https://github.com/Liu-Alan/Snai.CMS.UI/blob/main/images/role.jpg" width="95%" />   
